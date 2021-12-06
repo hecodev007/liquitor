@@ -1,0 +1,4 @@
+abigen --abi=cToken/cToken.abi --pkg=cToken --out=cToken/cToken.go
+abigen --abi=Unitroller/unitroller.abi --pkg=unitroller --out=Unitroller/unitroller.go
+abigen --abi=Erc20/erc20.abi --pkg=erc20 --out=Erc20/erc20.go
+abigen --abi=liquitor.abi --pkg=liquidtor --out=liquitor.go
