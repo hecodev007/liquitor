@@ -24,20 +24,10 @@ import (
 	"time"
 )
 
-//const fatory = "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f"
-//const host = "https://ropsten.infura.io/v3/fcfaf99bc9f94b148a65108207306f9e"
-//const liqContract = "0x923eca9a79bf9e8a06dc5d160af3a007068f2a7d" //test
-//const comContract = "0xcfa7b0e37f5AC60f3ae25226F5e39ec59AD26152"
-//const cTokenContract = ""
-
 const fatory = "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f"
 
 var host = "wss://mainnet.infura.io/ws/v3/fcfaf99bc9f94b148a65108207306f9e"
 
-//wss://mainnet.infura.io/ws/v3/85c51263825545bf8496006327bd98d1
-//wss://mainnet.infura.io/ws/v3/2719102f50be441d89e32a525c902d85
-//wss://mainnet.infura.io/ws/v3/4f685300a8d746209b81c96eb8b0e82d
-//const host = "wss://mainnet.infura.io/ws/v3/bcb800e6ebc0432ea9aac3c68b15577f"
 const liqContract = "0x812843fe3dDeABd672121705ff090f49DbAbf22d" //
 const comContract = "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b"
 const cTokenContract = ""
@@ -52,11 +42,6 @@ var liqBuf map[string]bool
 var index = 0
 var SuggestGasPrice = big.NewInt(50 * 1000000000)
 
-//ropsten test
-//const host = "https://ropsten.infura.io/v3/fcfaf99bc9f94b148a65108207306f9e"
-//const liqContract = "0x923eca9a79bf9e8a06dc5d160af3a007068f2a7d"
-//const comContract = "0xcfa7b0e37f5AC60f3ae25226F5e39ec59AD26152"
-//https://github.com/ConsenSys/ethereum-developer-tools-list/blob/master/EcosystemResources.md
 var isTest = false
 
 type ContractNet struct {
@@ -91,9 +76,6 @@ func InitNet(contractArray []string) *ContractNet {
 	lqtor, _ := liquitor.NewLiquidtor(common.HexToAddress(liqContract), client)
 	controller, _ := unitroller.NewUnitroller(common.HexToAddress(comContract), client)
 
-	//oneCtoken,_:=cToken.NewCToken(common.HexToAddress(cTokenContract), client)
-	//oneCtoken.BorrowBalanceCurrent()
-	//oneCtoken.BalanceOfUnderlying()
 	net := &ContractNet{
 		Liquitor:   lqtor,
 		Controller: controller,
@@ -446,7 +428,7 @@ func GetMaxBalCToken(cTokens []common.Address, borrower string, client *ethclien
 	}
 	return maxAddr
 }
-func InitConfigFromJson() {
+func InitConfigFromJson() []string {
 	// 打开文件
 	file, _ := os.Open("config.json")
 	// 关闭文件
@@ -462,12 +444,15 @@ func InitConfigFromJson() {
 	err := decoder.Decode(&cfg)
 	if err != nil {
 		fmt.Println(err)
+		return nil
 	}
 	golCtokens = make(map[string]CTokenConfig, 0)
+	contractArray := make([]string, 0)
 	for _, v := range cfg.Compound {
 		golCtokens[strings.ToUpper(v.Contract)] = v
+		contractArray = append(contractArray, v.Contract)
 	}
-	//fmt.Println(global.CONFIG)
+	return contractArray
 }
 func ToEther(input *big.Int, dec int32) decimal.Decimal {
 	a := decimal.NewFromBigInt(input, 0)
@@ -475,25 +460,22 @@ func ToEther(input *big.Int, dec int32) decimal.Decimal {
 	return b
 }
 func main() {
-	//cToken.FilLog("wss://ropsten.infura.io/ws/v3/fcfaf99bc9f94b148a65108207306f9e", "0x6b8b0d7875b4182fb126877023fb93b934dd302a")
-	cEth := "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5"
-	cDai := "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
-	cWbtc := "0xc11b1268c1a384e55c48c2391d8d480264a3a7f4"
-	cUsdc := "0x39aa39c021dfbae8fac545936693ac917d5e7563"
-	cUsdt := "0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9"
-	cBat := "0x6c8c6b02e7b2be14d4fa6022dfd6d75921d90e4e"
-	cComp := "0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4"
-	cLink := "0xface851a4921ce59e912d19329929ce6da6eb0c7"
-	cRep := "0x158079ee67fce2f58472a96584a73c7ab9ac95c1"
-	cSai := "0xf5dce57282a584d2746faf1593d3121fcac444dc"
-	cTusd := "0x12392f67bdf24fae0af363c24ac620a2f67dad86"
-	cUni := "0x35a18000230da775cac24873d00ff85bccded550"
-	cZrx := "0xb3319f5d18bc0d84dd1b4825dcde5d5f7266d407"
-	cWbtc2 := "0xccf4429db6322d5c611ee964527d42e5d685dd6a"
-	contractArray := []string{cEth, cDai, cWbtc, cUsdc, cUsdt, cBat, cComp, cLink, cRep, cSai, cTusd, cUni, cZrx, cWbtc2}
-	//mainet := "wss://mainnet.infura.io/ws/v3/fcfaf99bc9f94b148a65108207306f9e"
-	//mainet := "wss://mainnet.infura.io/ws/v3/bcb800e6ebc0432ea9aac3c68b15577f"
-	//	rospen:="wss://ropsten.infura.io/ws/v3/fcfaf99bc9f94b148a65108207306f9e"
+	//cEth := "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5"
+	//cDai := "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
+	//cWbtc := "0xc11b1268c1a384e55c48c2391d8d480264a3a7f4"
+	//cUsdc := "0x39aa39c021dfbae8fac545936693ac917d5e7563"
+	//cUsdt := "0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9"
+	//cBat := "0x6c8c6b02e7b2be14d4fa6022dfd6d75921d90e4e"
+	//cComp := "0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4"
+	//cLink := "0xface851a4921ce59e912d19329929ce6da6eb0c7"
+	//cRep := "0x158079ee67fce2f58472a96584a73c7ab9ac95c1"
+	//cSai := "0xf5dce57282a584d2746faf1593d3121fcac444dc"
+	//cTusd := "0x12392f67bdf24fae0af363c24ac620a2f67dad86"
+	//cUni := "0x35a18000230da775cac24873d00ff85bccded550"
+	//cZrx := "0xb3319f5d18bc0d84dd1b4825dcde5d5f7266d407"
+	//cWbtc2 := "0xccf4429db6322d5c611ee964527d42e5d685dd6a"
+	//contractArray := []string{cEth, cDai, cWbtc, cUsdc, cUsdt, cBat, cComp, cLink, cRep, cSai, cTusd, cUni, cZrx, cWbtc2}
+
 	tokens = make(map[string]*big.Int, 0)
 
 	cpuNum := runtime.NumCPU()
@@ -502,16 +484,11 @@ func main() {
 	//可以自己设置使用多个cpu
 	runtime.GOMAXPROCS(cpuNum - 1)
 
-
-
-
-	//var host = "wss://mainnet.infura.io/ws/v3/fcfaf99bc9f94b148a65108207306f9e"
-	//wss://mainnet.infura.io/ws/v3/85c51263825545bf8496006327bd98d1
-	//wss://mainnet.infura.io/ws/v3/2719102f50be441d89e32a525c902d85
-	//wss://mainnet.infura.io/ws/v3/4f685300a8d746209b81c96eb8b0e82d
-	//const host = "wss://mainnet.infura.io/ws/v3/bcb800e6ebc0432ea9aac3c68b15577f"
 	hostArray := []string{"wss://mainnet.infura.io/ws/v3/75c1d628b1d641ef9d9dac237bfe61a5", "wss://mainnet.infura.io/ws/v3/1c5430dcaba64f2a9d70432ef89aabe6", "wss://mainnet.infura.io/ws/v3/e3f31f4687294d2f904822855239035f", "wss://mainnet.infura.io/ws/v3/208d78944bbe48e393bccbf20ef494a7", "wss://mainnet.infura.io/ws/v3/630b59e0d28a4bcdafb1a0c52640f522", "wss://mainnet.infura.io/ws/v3/abc17edccebb4ff4a9318b848170faeb", "wss://mainnet.infura.io/ws/v3/fcfaf99bc9f94b148a65108207306f9e", "wss://mainnet.infura.io/ws/v3/85c51263825545bf8496006327bd98d1", "wss://mainnet.infura.io/ws/v3/2719102f50be441d89e32a525c902d85", "wss://mainnet.infura.io/ws/v3/4f685300a8d746209b81c96eb8b0e82d", "wss://mainnet.infura.io/ws/v3/bcb800e6ebc0432ea9aac3c68b15577f", "wss://mainnet.infura.io/ws/v3/6c3cec5a40674f7b9d4cdb293550469e", "wss://mainnet.infura.io/ws/v3/a8371dbc3fb244fb8abaf7126ab8f915"}
-	InitConfigFromJson()
+	contractArray := InitConfigFromJson()
+	if contractArray == nil{
+		return
+	}
 	go LiquitorHandler(contractArray, hostArray)
 	//go cToken.FilOne(mainet, "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b", contractArray, 10234467)
 	go cToken.GetEvent(host, "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b", contractArray, hostArray)
